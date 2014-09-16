@@ -52,14 +52,14 @@ void updateControl(){
 
 
 int updateAudio(){
-  // subtracting 512 moves the unsigned audio data into 0-centred, 
-  // signed range required by all Mozzi units
-  int asig = getAudioInput()-512;  
+
+  int asig = getAudioInput();  
   int sample = asig;
   addSample(sample);
   //asig = asig+samplebuf[counter%varsamplebuflength];
-  asig = samplebuf[counter%varsamplebuflength];
   //asig >>=2;
+  // or signal only
+  asig = samplebuf[counter%varsamplebuflength];
   return asig;
 }
 

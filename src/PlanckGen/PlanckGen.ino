@@ -1,32 +1,52 @@
 #include <MozziGuts.h>
-#include <LowPassFilter.h>
 #include <mozzi_fixmath.h>
 
 #define KNOB_PIN 1
 
-const int BUTTON_PIN = 4;  // set the digital input pin for the button
+#define BUTTON_PIN 5  // set the digital input pin for the button
+#define CONTROL_RATE 128
 
-LowPassFilter lpf;
 int MODE = 0;
 boolean SAMPLE = false;
 int counter = 0;
-const int samplebuflength = 16384;
+const int samplebuflength = 400;
 int samplebuf[samplebuflength];
+int varsamplebuflength = samplebuflength;
+int button_state = HIGH;
 
 void setup(){
-  startMozzi();
+  pinMode(BUTTON_PIN, INPUT);
+  
+  startMozzi(CONTROL_RATE);
 }
 
+void addSample(int signal){
+  if(SAMPLE){
+    samplebuf[counter]=signal;
+  }
+  counter++;
+  if(counter>samplebuflength){
+     counter = 0; 
+  }
+}
 
 void updateControl(){
+  
   int knob = mozziAnalogRead(KNOB_PIN); 
-  byte cutoff_freq = knob>>2; // range 0-255
-   button_state = digitalRead(BUTTON_PIN);
-   if(button_state == HIGH){
-     SAMPLE = false; 
-   }else{
-     SAMPLE = true;
-   }
+  varsamplebuflength = knob>>2;
+  if(varsamplebuflength > 400){
+     varsamplebuflength = 400; 
+  }
+  if(varsamplebuflength<0){
+   varsamplebuflength=0; 
+  }
+  
+  button_state = digitalRead(BUTTON_PIN);
+  if(button_state == HIGH){
+    SAMPLE = false; 
+  }else{
+    SAMPLE = true;
+  }
 
 }
 
@@ -34,16 +54,13 @@ void updateControl(){
 int updateAudio(){
   // subtracting 512 moves the unsigned audio data into 0-centred, 
   // signed range required by all Mozzi units
-  if(SAMPLE){
-    int asig = getAudioInput()-512;  
-    samplebuf[counter]=asig;
-  }
-  counter++;
-  if(counter>=samplebuflength){
-    counter=0;
-  }
-//  asig = lpf.next(asig>>1);
-  return samplebuf[counter];
+  int asig = getAudioInput()-512;  
+  int sample = asig;
+  addSample(sample);
+  //asig = asig+samplebuf[counter%varsamplebuflength];
+  asig = samplebuf[counter%varsamplebuflength];
+  //asig >>=2;
+  return asig;
 }
 
 

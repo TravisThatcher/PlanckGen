@@ -56,10 +56,14 @@ int updateAudio(){
   int asig = getAudioInput();  
   int sample = asig;
   addSample(sample);
-  //asig = asig+samplebuf[counter%varsamplebuflength];
-  //asig >>=2;
+  if(SAMPLE){
+    asig = samplebuf[counter%varsamplebuflength];
+//    asig >>=2;
+  }else{
+    
+  }
   // or signal only
-  asig = samplebuf[counter%varsamplebuflength];
+  //asig = samplebuf[counter%varsamplebuflength];
   return asig;
 }
 

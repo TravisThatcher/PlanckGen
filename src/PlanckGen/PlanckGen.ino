@@ -12,11 +12,11 @@ int MODE = 0;
 boolean SAMPLE = false;
 int counter = 0;
 int readCounter = 0;
-const int samplebuflength = 400;
+const int samplebuflength = 800;
 
 int varsamplebuflength = samplebuflength;
 
-int samplebuf[samplebuflength];
+byte samplebuf[samplebuflength];
 
 AutoMap Mapper(0,1024, 0, samplebuflength);
 
@@ -25,28 +25,32 @@ int button_state = HIGH;
 void setup(){
   pinMode(BUTTON_PIN, INPUT);  
   startMozzi(CONTROL_RATE);
+  readCounter = samplebuflength/2;
 }
 
 void addSample(int signal){
   if(SAMPLE){
-      samplebuf[counter]=signal;
+    samplebuf[counter]=signal;
   }
   counter++;
   if(counter>samplebuflength){
-     counter = 0; 
+    counter = 0; 
   }
 }
 
 void updateControl(){
-  
+
   int knob = mozziAnalogRead(KNOB_PIN); 
   varsamplebuflength = Mapper(knob);
- 
+
   button_state = digitalRead(BUTTON_PIN);
-  if(button_state == HIGH){
-    SAMPLE = false; 
-  }else{
-    SAMPLE = true;
+  if(button_state == LOW){
+    if(SAMPLE==true){
+      SAMPLE = false; 
+    }
+    else{
+      SAMPLE = true; 
+    }
   }
 
 }
@@ -61,8 +65,8 @@ int updateAudio(){
     readCounter = 0; 
   }
   if(SAMPLE){
-//      asig = samplebuf[counter%varsamplebuflength];
-      asig = samplebuf[readCounter];
+    //      asig = samplebuf[counter%varsamplebuflength];
+    asig = samplebuf[readCounter];
   }
   readCounter++;
   return asig;
@@ -72,6 +76,7 @@ int updateAudio(){
 void loop(){
   audioHook();
 }
+
 
 
 

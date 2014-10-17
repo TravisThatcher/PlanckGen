@@ -20,7 +20,7 @@ byte samplebuf[samplebuflength];
 
 AutoMap Mapper(0,1024, 0, samplebuflength);
 
-int button_state = HIGH;
+int button_state = LOW;
 
 void setup(){
   pinMode(BUTTON_PIN, INPUT);  
@@ -44,13 +44,10 @@ void updateControl(){
   varsamplebuflength = Mapper(knob);
 
   button_state = digitalRead(BUTTON_PIN);
-  if(button_state == LOW){
-    if(SAMPLE==true){
-      SAMPLE = false; 
-    }
-    else{
-      SAMPLE = true; 
-    }
+  if(button_state == HIGH){
+    SAMPLE = true; 
+  }else{
+    SAMPLE = false; 
   }
 
 }

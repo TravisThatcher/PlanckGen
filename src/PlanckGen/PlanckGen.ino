@@ -33,7 +33,7 @@ void addSample(int signal){
     samplebuf[counter]=signal;
   }
   counter++;
-  if(counter>samplebuflength){
+  if(counter>varsamplebuflength){
     counter = 0; 
   }
 }
